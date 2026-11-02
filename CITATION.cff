@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use the vPQM tool, please cite the publication below."
+title: "vPQM: volume-stratified plan quality metric for brain SRS/SRT (QA tool)"
+version: "4.0.0"
+date-released: "2026-10-31"
+license: MIT
+authors:
+  - family-names: "Eid"
+    given-names: "Ali Abdelaziz"
+    affiliation: "[add affiliation]"
+preferred-citation:
+  type: article
+  title: "Volume-stratified benchmarks of achievable plan quality and a volume-adaptive plan quality metric (vPQM) for stereotactic radiosurgery and radiotherapy"
+  authors:
+    - family-names: "Eid"
+      given-names: "Ali Abdelaziz"
+  journal: "[add journal]"
+  year: 2026
+  doi: "[add DOI]"

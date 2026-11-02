@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>vPQM — plan quality assurance tool for brain SRS/SRT</title>
+<meta name="description" content="Volume-stratified plan quality metric (vPQM) for brain SRS/SRT plan quality assurance. Research and QA use only.">
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#1d2533;--mut:#5d6b80;--line:#dde3ec;--acc:#1f5fa8}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+header{background:linear-gradient(90deg,#163f73,#1f5fa8);color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header h1{margin:0;font-size:20px;font-weight:600}header .sub{opacity:.88;font-size:12.5px;margin-top:3px}
+.badge{background:#ffcc33;color:#4a3500;font-weight:700;font-size:11.5px;padding:5px 10px;border-radius:12px;letter-spacing:.3px;text-align:center}
+.disc{max-width:1180px;margin:14px auto 0;padding:10px 14px;background:#fff8e1;border:1px solid #f0d58a;border-radius:8px;font-size:12.5px;color:#5a4300}
+main{max-width:1180px;margin:14px auto;padding:0 16px;display:grid;grid-template-columns:370px 1fr;gap:16px}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+h2{font-size:14px;text-transform:uppercase;letter-spacing:.6px;color:var(--acc);margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:3px}
+input,select{width:100%;padding:7px 8px;border:1px solid #c9d2df;border-radius:6px;font-size:14px;background:#fbfcfe}
+input:focus,select:focus{outline:2px solid #9cc2f0;border-color:var(--acc)}
+input:disabled{background:#eef0f3;color:#9aa4b2}
+.sec{grid-column:1/-1;font-size:11.5px;font-weight:700;border-bottom:1px solid var(--line);padding-bottom:3px;margin-top:6px}
+.seg{grid-column:1/-1;display:flex;border:1px solid #c9d2df;border-radius:8px;overflow:hidden}
+.seg label{flex:1;margin:0;text-align:center;padding:8px 4px;cursor:pointer;font-size:12.5px;color:var(--ink);background:#fbfcfe}
+.seg input{display:none}.seg input:checked+span{font-weight:700;color:#fff}
+.seg label:has(input:checked){background:var(--acc);color:#fff;font-weight:700}
+.ex{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.ex button,.btn{border:1px solid var(--line);background:#eef3fa;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer}
+.ex button:hover,.btn:hover{background:#dde8f6}
+.top{display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:center}
+@media(max-width:600px){.top{grid-template-columns:1fr}}
+.score{text-align:center;border-radius:10px;padding:14px 8px;color:#fff;background:#888}
+.score .n{font-size:52px;font-weight:700;line-height:1}.score .z{font-size:16px;font-weight:600;margin-top:6px}.score .a{font-size:12px;opacity:.95;margin-top:4px}
+.scale{position:relative;height:26px;border-radius:6px;overflow:hidden;display:flex}.scale div{height:100%}
+.mk{position:absolute;top:-6px;width:3px;height:38px;background:#111;border-radius:2px}
+.tick{font-size:11px;color:var(--mut);margin-top:4px;position:relative;height:14px}
+.dom{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.dom div{background:#f5f8fc;border-radius:8px;padding:8px 10px}.dom b{font-size:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--mut);font-weight:600;font-size:11.5px;border-bottom:1px solid var(--line);padding:6px 4px}
+td{padding:7px 4px;border-bottom:1px solid #eef1f5;vertical-align:middle}
+.bar{background:#e7ebf1;border-radius:4px;height:10px;width:110px;overflow:hidden;display:inline-block;vertical-align:middle}.bar i{display:block;height:100%}
+.gate{background:#fdecea;border:1px solid #f5c2bd;color:#8e1c12;border-radius:8px;padding:8px 12px;margin-top:12px;font-weight:600}
+.warn{background:#fff4e5;border:1px solid #f3c98b;color:#7a4a00;border-radius:8px;padding:8px 12px;margin-top:12px}
+.tips{margin:8px 0 0;padding-left:18px}.tips li{margin:3px 0}
+.note{font-size:12px;color:var(--mut);line-height:1.5}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:8px}.legend span{display:flex;align-items:center;gap:5px}.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.about{max-width:1180px;margin:0 auto 16px;padding:0 16px}.about .card p{line-height:1.6;margin:8px 0}.about h3{font-size:14px;margin:14px 0 4px}
+footer{max-width:1180px;margin:0 auto 24px;padding:0 16px;font-size:11.5px;color:var(--mut);line-height:1.6}
+.pill{display:inline-block;background:#e8f0fa;color:#1f5fa8;border-radius:10px;padding:1px 8px;font-size:11.5px;font-weight:600}
+</style></head><body>
+<header><div><h1>vPQM — Volume-stratified Plan Quality Metric</h1>
+<div class="sub">Plan quality assurance and assessment for brain SRS / SRT (1, 3 and 5 fractions) · conformity by CI<sub>RTOG</sub> or Paddick CI · Designed by Ali Eid</div></div>
+<div class="badge">QA &amp; RESEARCH TOOL<br>NOT FOR CLINICAL DECISION-MAKING</div></header>
+<div class="disc"><b>Intended use.</b> This calculator is a plan quality assurance and assessment check. It compares a finished plan with what fully optimised plans of the same volume, shape and location achieved in our reference atlas. It does not approve plans, replace physics and physician review, or check anything it is not given (for example cumulative dose after re-irradiation). Benchmarks come from a single institution and are being validated in a multi-institutional study.</div>
+<main>
+<section class="card">
+<h2>Plan input</h2>
+<div class="grid">
+<div class="sec">Conformity index used for scoring</div>
+<div class="seg"><label><input type="radio" name="metric" value="RTOG" checked>CI<sub>RTOG</sub> (PIV/TV)</label><label><input type="radio" name="metric" value="Paddick">Paddick CI</label></div>
+<div class="sec">Case</div>
+<div><label>Scheme</label><select id="scheme"><option>SRS</option><option>3FR</option><option>5FR</option></select></div>
+<div><label>Rx dose (Gy, record only)</label><input id="rx" type="number" step="0.1" value="18"></div>
+<div><label>PTV volume (cm³)</label><input id="vol" type="number" step="0.1" min="0.05" max="40" value="6"></div>
+<div><label>Shape</label><select id="shape"><option>regular</option><option>irregular</option></select></div>
+<div style="grid-column:1/-1"><label>Location</label><select id="loc"><option>central</option><option>peripheral</option></select></div>
+<div class="sec">Conformity &amp; quality</div>
+<div><label>CI<sub>RTOG</sub> (PIV/TV)</label><input id="CI" type="number" step="0.01" value="1.15"></div>
+<div><label>Paddick CI (TV<sub>PIV</sub>²/(TV×PIV))</label><input id="PCI" type="number" step="0.01" value="0.82"></div>
+<div><label>GI (V<sub>50%</sub>/V<sub>100%</sub>)</label><input id="GI" type="number" step="0.01" value="3.0"></div>
+<div><label>Q<sub>RTOG</sub> (Dmin/Rx)</label><input id="Q" type="number" step="0.01" value="0.90"></div>
+<div><label>HI (Dmax/Rx)</label><input id="HI" type="number" step="0.01" value="1.15"></div>
+<div></div>
+<div class="sec">Coverage &amp; safety</div>
+<div><label>D99 (% of Rx)</label><input id="D99" type="number" step="0.1" value="96"></div>
+<div><label id="brainLab">Brain − target V12Gy (cm³)</label><input id="brain" type="number" step="0.1" value="7"></div>
+<div><label>OAR in high-dose region</label><select id="oar"><option value="">none</option><option value="brainstem">brainstem</option><option value="optic">optic chiasm / nerve</option><option value="cochlea">cochlea</option></select></div>
+<div><label>OAR Dmax / D0.03cc (Gy)</label><input id="oard" type="number" step="0.1" value=""></div>
+</div>
+<div class="ex"><span class="note" style="width:100%">Examples:</span>
+<button data-ex="0">Approve</button><button data-ex="1">Review</button><button data-ex="2">Re-optimise</button><button data-ex="3">Constraint failure</button></div>
+<div class="ex"><button class="btn" id="copy">Copy result as text</button></div>
+</section>
+
+<section>
+<div class="card">
+<div class="top">
+<div id="scoreBox" class="score"><div class="n" id="sc">–</div><div class="z" id="zone">–</div><div class="a" id="act"></div></div>
+<div>
+<div style="position:relative">
+<div class="scale"><div style="width:75%;background:#f3b3ad"></div><div style="width:10%;background:#f8dc8a"></div><div style="width:15%;background:#a9d8ab"></div></div>
+<div class="mk" id="mk" style="left:0"></div></div>
+<div class="tick"><span style="position:absolute;left:0">0</span><span style="position:absolute;left:75%;transform:translateX(-50%)">75</span><span style="position:absolute;left:85%;transform:translateX(-50%)">85</span><span style="position:absolute;right:0">100</span></div>
+<div class="legend"><span><i style="background:#c62828"></i>Constraint failed</span><span><i style="background:#e8700a"></i>&lt; 75 re-optimise</span><span><i style="background:#d9a400"></i>75–85 review</span><span><i style="background:#2e7d32"></i>&gt; 85 meets benchmark</span></div>
+<div class="dom"><div>Domain A · safety &amp; coverage<br><b id="dA">–</b> / 55</div><div>Domain B · quality (<span id="mname">CI<sub>RTOG</sub></span>)<br><b id="dB">–</b> / 45</div></div>
+</div></div>
+<div id="gates"></div><div id="warns"></div>
+</div>
+<div class="card" style="margin-top:16px">
+<h2>Component breakdown</h2>
+<table><thead><tr><th>Component</th><th>Plan</th><th>Ideal (achievable)</th><th>Threshold</th><th>Points</th><th></th></tr></thead><tbody id="tb"></tbody></table>
+<p class="note">Each component earns full points at or better than its ideal, falls linearly to 25% of its points at the threshold and scores 0 beyond it (PQM value functions, Nelms et al.). Ideals for brain dose, conformity, GI and Q<sub>RTOG</sub> are the bin medians of fully optimised atlas plans of the same volume and shape (brain dose also by scheme and location), interpolated in log-volume. Only the selected conformity index is scored; the other is ignored.</p>
+</div>
+<div class="card" style="margin-top:16px">
+<h2>What to look at</h2>
+<ul class="tips" id="tips"></ul>
+</div>
+</section>
+</main>
+
+<div class="about"><div class="card">
+<h2>About this tool</h2>
+<p><b>What it is.</b> The vPQM is a plan quality assurance and assessment tool for intracranial stereotactic radiosurgery (SRS) and hypofractionated stereotactic radiotherapy (3 and 5 fractions). Conventional checks compare every plan with fixed thresholds such as CI &lt; 1.2 and GI &lt; 3, although the conformity and gradient that can be achieved depend strongly on target volume and shape. The vPQM instead compares each plan with what fully optimised plans of the same volume and shape achieved in a reference atlas of 367 saturated VMAT plans, while safety limits (normal-brain dose, OAR dose, coverage) stay absolute. The result is a single score with a component breakdown that shows where a plan falls short of what its geometry allows.</p>
+<p><b>How to use it in QA.</b> Enter the metrics of a finished plan from your planning system and choose the conformity index your department reports — the RTOG index (PIV/TV) or the Paddick index (TV<sub>PIV</sub>²/(TV×PIV)) recommended by ICRU Report 91. A score above 85 means the plan reaches the achievable benchmark for its geometry; 75–85 means it is acceptable but one or more components lie below the benchmark and should be reviewed; below 75 suggests re-optimisation is likely to improve it; a red banner means a hard constraint is exceeded. Use the breakdown to decide where improvement is possible (for example the gradient or the minimum target dose), and record the score alongside your usual plan checks.</p>
+<p><b>What it is not.</b> The vPQM is a quality-assurance and research aid, not a medical device and not a basis for clinical decisions. It does not approve or reject plans: acceptance remains the responsibility of the treating physicist and radiation oncologist under local protocols. It sees only the values entered — it cannot assess re-irradiation or cumulative dose, OARs other than those entered, target delineation, dose calculation accuracy or deliverability. The benchmarks were derived on one planning system (Monaco, Elekta Versa HD, 6 MV FFF VMAT) at one institution; other techniques, systems or prescription conventions may achieve different values.</p>
+<h3>Validation status and multi-institutional study</h3>
+<p>In a single-institution development cohort of 41 clinical plans (13 returned for re-optimisation), the score discriminated returned from accepted plans with an AUC of about 0.91 with either conformity index, and no returned plan scored above 85. The 75 and 85 boundaries were set on this cohort and are being tested prospectively. We invite departments to use the tool on their own plans and share anonymised results (plan metrics, the score and the clinical decision) so that the benchmarks and cut-offs can be validated across institutions, planning systems and techniques. <span class="pill">contact: [add e-mail / GitHub issues]</span></p>
+<h3>How the score is built</h3>
+<p class="note"><b>Domain A — safety and coverage (55 points):</b> normal-brain dose (20; ideal = achievable dose for scheme, location, shape and volume, threshold = limit: SRS V12Gy 10 cm³, 3 fractions V20Gy 20 cm³, 5 fractions V24Gy 20 cm³); OAR maximum dose (20; ideal = TG-101 small-volume dose, threshold = TG-101 maximum point dose; full points if no OAR is near); coverage D99 (15; ideal 95%, threshold 90%). <b>Domain B — quality (45 points):</b> conformity by CI<sub>RTOG</sub> (threshold = ideal × 1.41, at most 2.0) <i>or</i> Paddick CI (threshold = ideal ÷ 1.41, at least 0.50) (15); GI (threshold = ideal × 1.52) (15); Q<sub>RTOG</sub> (ideal = bin median up to 0.90, threshold 0.80) (15). Thresholds equal the measured ratio between first-loop and fully optimised plans. <b>Hard constraints:</b> brain or OAR limit exceeded, D99 &lt; 90% or HI &gt; 1.2. A value equal to a limit is marginal and still compliant.</p>
+</div></div>
+<footer>
+References: Nelms BE et al. Pract Radiat Oncol 2012 (plan quality metric); Paddick I. J Neurosurg 2000; Paddick I, Lippitz B. J Neurosurg 2006; Shaw E et al. IJROBP 1993 (RTOG QA guidelines); ICRU Report 91 (2014); Benedict SH et al. Med Phys 2010 (TG-101); Milano MT et al. IJROBP 2021 (HyTEC).<br>
+vPQM v4 · benchmark atlas MASTER v13 (31 Oct 2026) · runs entirely in the browser; no data are sent or stored. Provided “as is” without warranty for quality-assurance and research use only. Designed by Ali Eid.
+</footer>
+<script>
+const BENCH={"Q":{"regular":[{"v":0.12747548783981966,"CI":1.49,"CIt":2.0,"PCI":0.6525000000000001,"PCIt":0.5,"GI":7.404999999999999,"GIt":11.255441137034056,"Q":0.9},{"v":0.3584968619109517,"CI":1.2149999999999999,"CIt":1.7130874785591763,"PCI":0.6849999999999999,"PCIt":0.5,"GI":4.635,"GIt":7.04510056315366,"Q":0.9},{"v":0.75,"CI":1.146346153846154,"CIt":1.6162890882702203,"PCI":0.7220000000000001,"PCIt":0.5120754257907544,"GI":4.635,"GIt":7.04510056315366,"Q":0.9},{"v":1.4949916387726054,"CI":1.146346153846154,"CIt":1.6162890882702203,"PCI":0.8033186440677965,"PCIt":0.569750327848571,"GI":3.66,"GIt":5.563121480289622,"Q":0.9},{"v":2.8,"CI":1.146346153846154,"CIt":1.6162890882702203,"PCI":0.8033186440677965,"PCIt":0.569750327848571,"GI":2.9,"GIt":4.407937784928936,"Q":0.9},{"v":7.211102550927977,"CI":1.1065714285714288,"CIt":1.560208772359716,"PCI":0.8033186440677965,"PCIt":0.569750327848571,"GI":2.48,"GIt":3.7695467953875035,"Q":0.9},{"v":13.999999999999996,"CI":1.1065714285714288,"CIt":1.560208772359716,"PCI":0.8033186440677965,"PCIt":0.569750327848571,"GI":2.288775510204082,"GIt":3.4788896733270946,"Q":0.9},{"v":17.999999999999996,"CI":1.1065714285714288,"CIt":1.560208772359716,"PCI":0.8133250000000001,"PCIt":0.5768472931873481,"GI":2.288775510204082,"GIt":3.4788896733270946,"Q":0.9},{"v":22.000000000000004,"CI":1.0550000000000002,"CIt":1.4874957118353347,"PCI":0.8133250000000001,"PCIt":0.5768472931873481,"GI":2.288775510204082,"GIt":3.4788896733270946,"Q":0.9},{"v":27.999999999999996,"CI":1.0329411764705883,"CIt":1.4563939057612754,"PCI":0.8133250000000001,"PCIt":0.5768472931873481,"GI":2.288775510204082,"GIt":3.4788896733270946,"Q":0.9},{"v":32.0,"CI":1.0329411764705883,"CIt":1.4563939057612754,"PCI":0.845,"PCIt":0.5993126520681266,"GI":2.2649999999999997,"GIt":3.442751407884151,"Q":0.9},{"v":38.49675310984031,"CI":1.0329411764705883,"CIt":1.4563939057612754,"PCI":0.8494999999999999,"PCIt":0.6025042579075426,"GI":2.2,"GIt":3.3439528023598823,"Q":0.89}],"irregular":[{"v":0.12747548783981966,"CI":1.48,"CIt":2.0,"PCI":0.6425000000000001,"PCIt":0.5,"GI":7.31,"GIt":11.111043175113972,"Q":0.9},{"v":0.3584968619109517,"CI":1.295,"CIt":1.8258833619210977,"PCI":0.67,"PCIt":0.5,"GI":4.786666666666667,"GIt":7.275630642710289,"Q":0.9},{"v":0.75,"CI":1.1891405405405404,"CIt":1.6766269713967825,"PCI":0.7,"PCIt":0.5,"GI":4.786666666666667,"GIt":7.275630642710289,"Q":0.9},{"v":1.4949916387726054,"CI":1.1891405405405404,"CIt":1.6766269713967825,"PCI":0.7823033333333334,"PCIt":0.5548453081914031,"GI":4.0912,"GIt":6.218536229552158,"Q":0.9},{"v":2.8,"CI":1.1891405405405404,"CIt":1.6766269713967825,"PCI":0.7823033333333334,"PCIt":0.5548453081914031,"GI":3.2117692307692307,"GIt":4.881820327165459,"Q":0.9},{"v":7.211102550927977,"CI":1.1891405405405404,"CIt":1.6766269713967825,"PCI":0.7823033333333334,"PCIt":0.5548453081914031,"GI":3.2117692307692307,"GIt":4.881820327165459,"Q":0.8851016129032259},{"v":13.999999999999996,"CI":1.1891405405405404,"CIt":1.6766269713967825,"PCI":0.7823033333333334,"PCIt":0.5548453081914031,"GI":2.856666666666667,"GIt":4.342072047912756,"Q":0.8851016129032259},{"v":17.999999999999996,"CI":1.1749999999999996,"CIt":1.6566895368782155,"PCI":0.79375,"PCIt":0.5629638077858881,"GI":2.856666666666667,"GIt":4.342072047912756,"Q":0.8851016129032259},{"v":22.000000000000004,"CI":1.13855,"CIt":1.6052969125214407,"PCI":0.79375,"PCIt":0.5629638077858881,"GI":2.756153846153846,"GIt":4.189294717082327,"Q":0.8851016129032259},{"v":27.999999999999996,"CI":1.13855,"CIt":1.6052969125214407,"PCI":0.79375,"PCIt":0.5629638077858881,"GI":2.756153846153846,"GIt":4.189294717082327,"Q":0.8851016129032259},{"v":32.0,"CI":1.13855,"CIt":1.6052969125214407,"PCI":0.8194999999999999,"PCIt":0.5812268856447688,"GI":2.525,"GIt":3.837945829981228,"Q":0.88},{"v":38.49675310984031,"CI":1.13855,"CIt":1.6052969125214407,"PCI":0.835,"PCIt":0.592220194647202,"GI":2.33,"GIt":3.5415500134084206,"Q":0.8474999999999999}]},"B":{"3FR|central|irregular":[[14.491376746189436,8.545],[17.999999999999996,16.1],[22.000000000000004,21.2],[27.999999999999996,24.0],[32.0,26.8]],"3FR|central|regular":[[15.0,8.6],[17.999999999999996,15.0],[22.000000000000004,20.0],[27.999999999999996,23.12],[32.0,25.12]],"3FR|peripheral|irregular":[[17.999999999999996,12.1],[22.000000000000004,16.12],[27.999999999999996,18.85],[32.0,22.540000000000003]],"3FR|peripheral|regular":[[17.999999999999996,11.5],[22.000000000000004,15.1],[27.999999999999996,18.5],[32.0,21.5]],"5FR|central|irregular":[[22.49444375840399,17.155],[27.999999999999996,18.746],[32.98484500494128,19.85],[38.49675310984031,28.0]],"5FR|central|regular":[[22.49444375840399,16.425],[27.999999999999996,18.2],[32.98484500494128,19.35],[38.49675310984031,27.0]],"5FR|peripheral|irregular":[[22.49444375840399,13.53],[27.999999999999996,14.924],[32.98484500494128,15.904],[38.49675310984031,19.95]],"5FR|peripheral|regular":[[22.49444375840399,13.0115],[27.999999999999996,14.178000000000003],[32.98484500494128,15.615],[38.49675310984031,19.25]],"SRS|central|irregular":[[0.12747548783981966,1.05],[0.3584968619109517,2.05],[0.75,3.7],[1.4949916387726054,4.7],[2.8,6.6],[7.211102550927977,8.57],[13.49073756323204,10.5],[17.4928556845359,12.75]],"SRS|central|regular":[[0.12747548783981966,1.15],[0.3584968619109517,1.9],[0.75,3.5],[1.4949916387726054,4.1],[2.8,6.4],[7.211102550927977,8.15],[13.49073756323204,9.9],[17.4928556845359,11.55]],"SRS|peripheral|irregular":[[0.12747548783981966,0.7775000000000001],[0.3584968619109517,1.375],[0.75,2.8],[1.4949916387726054,3.9500000000000006],[2.8,5.4],[7.211102550927977,7.400000000000001],[13.49073756323204,8.8],[17.4928556845359,10.3]],"SRS|peripheral|regular":[[0.12747548783981966,0.7065],[0.3584968619109517,1.35],[0.75,2.6],[1.4949916387726054,3.5],[2.8,5.076],[7.211102550927977,7.2],[13.49073756323204,8.448],[17.4928556845359,10.254999999999999]]}};
+const BLIM={SRS:10,'3FR':20,'5FR':20}, FX={SRS:1,'3FR':3,'5FR':5}, BMET={SRS:'V12Gy','3FR':'V20Gy','5FR':'V24Gy'};
+const TG={brainstem:{1:15,3:23.1,5:31},optic:{1:10,3:17.4,5:25},cochlea:{1:9,3:17.1,5:25}};
+const TGV={brainstem:{1:10,3:18,5:23},optic:{1:8,3:15.3,5:23},cochlea:{1:9*0.67,3:17.1*0.67,5:25*0.67}};
+const FLOOR=0.25, CUT=75, OPT=85;
+const r1=x=>{const y=x*10,f=Math.floor(y);return (Math.abs(y-f-0.5)<1e-9?(f%2===0?f:f+1):Math.round(y))/10;}; // half-to-even, as the Python reference
+function interp(nodes,v){const x=Math.log(v);const xs=nodes.map(n=>Math.log(n[0]));
+ if(x<=xs[0])return nodes[0][1]; if(x>=xs[xs.length-1])return nodes[nodes.length-1][1];
+ for(let i=0;i<xs.length-1;i++) if(x<=xs[i+1]){const t=(x-xs[i])/(xs[i+1]-xs[i]);return nodes[i][1]+t*(nodes[i+1][1]-nodes[i][1]);}}
+function q(m,shape,v){return interp(BENCH.Q[shape].map(r=>[r.v,r[m]]),v)}
+function vf(x,ideal,thr,p,lower=true){ if(x===null||x===undefined||isNaN(x))return p;
+ let f; if(lower){if(x<=ideal)return p; if(x>thr)return 0; f=(x-ideal)/(thr-ideal);}
+ else{if(x>=ideal)return p; if(x<thr)return 0; f=(ideal-x)/(ideal-thr);}
+ return r1(p*(1-(1-FLOOR)*f));}
+function score(c){
+ const blim=BLIM[c.scheme], fx=FX[c.scheme];
+ const bn=BENCH.B[c.scheme+'|'+c.loc+'|'+c.shape];
+ const bi=Math.min(bn?interp(bn,c.vol):NaN,0.9*blim);
+ const comp=[];
+ comp.push({k:'Brain − target '+BMET[c.scheme]+' (cm³)',x:c.brain,i:bi,t:blim,p:vf(c.brain,bi,blim,20),m:20,d:'A'});
+ if(c.oar&&!isNaN(c.oard)){const ol=TG[c.oar][fx],oi=TGV[c.oar][fx];comp.push({k:'OAR '+c.oar+' Dmax (Gy)',x:c.oard,i:oi,t:ol,p:vf(c.oard,oi,ol,20),m:20,d:'A'});}
+ else comp.push({k:'OAR (none in high-dose region)',x:null,i:null,t:null,p:20,m:20,d:'A'});
+ const d=c.D99>1.5?c.D99/100:c.D99;
+ comp.push({k:'Coverage D99 (% Rx)',x:c.D99>1.5?c.D99:c.D99*100,i:95,t:90,p:vf(d,0.95,0.90,15,false),m:15,d:'A',hi:true});
+ if(c.metric==='Paddick'){const pi=q('PCI',c.shape,c.vol),pt=q('PCIt',c.shape,c.vol);
+  comp.push({k:'Paddick CI',x:c.PCI,i:pi,t:pt,p:(isNaN(c.PCI)?NaN:vf(c.PCI,pi,pt,15,false)),m:15,d:'B',hi:true,two:true});}
+ else{const ci=q('CI',c.shape,c.vol),ct=q('CIt',c.shape,c.vol);
+  comp.push({k:'CI_RTOG',x:c.CI,i:ci,t:ct,p:vf(c.CI,ci,ct,15),m:15,d:'B',two:true});}
+ const gi=q('GI',c.shape,c.vol),git=q('GIt',c.shape,c.vol),qi=q('Q',c.shape,c.vol);
+ comp.push({k:'GI',x:c.GI,i:gi,t:git,p:vf(c.GI,gi,git,15),m:15,d:'B'});
+ comp.push({k:'Q_RTOG',x:c.Q,i:qi,t:0.80,p:vf(c.Q,qi,0.80,15,false),m:15,d:'B',hi:true,two:true});
+ const A=comp.filter(x=>x.d=='A').reduce((s,x)=>s+x.p,0),B=comp.filter(x=>x.d=='B').reduce((s,x)=>s+x.p,0);
+ const g=[]; if(!isNaN(c.brain)&&Math.round(c.brain*1e4)/1e4>blim)g.push('Brain '+BMET[c.scheme]+' '+c.brain+' cm³ exceeds the '+blim+' cm³ limit');
+ if(c.oar&&!isNaN(c.oard)&&Math.round(c.oard*1e4)/1e4>TG[c.oar][fx])g.push('OAR '+c.oar+' '+c.oard+' Gy exceeds TG-101 '+TG[c.oar][fx]+' Gy');
+ if(!isNaN(c.HI)&&c.HI>1.2)g.push('HI '+c.HI+' > 1.2'); if(!isNaN(d)&&d<0.90)g.push('D99 below 90%');
+ const tot=r1(A+B);
+ const zone=g.length?'Constraint failed':tot<CUT?'Re-optimise':tot<=OPT?'Review':'Meets benchmark';
+ return {comp,A:r1(A),B:r1(B),tot,g,zone};}
+if(typeof module!=='undefined'){module.exports={score};}
+else{
+const $=id=>document.getElementById(id);
+const metric=()=>document.querySelector('input[name=metric]:checked').value;
+function read(){const n=id=>{const v=$(id).value;return v===''?NaN:parseFloat(v)};
+ return {metric:metric(),scheme:$('scheme').value,vol:n('vol'),shape:$('shape').value,loc:$('loc').value,CI:n('CI'),PCI:n('PCI'),GI:n('GI'),Q:n('Q'),HI:n('HI'),D99:n('D99'),brain:n('brain'),oar:$('oar').value,oard:n('oard')};}
+const COL={'Constraint failed':'#c62828','Re-optimise':'#e8700a',Review:'#d9a400','Meets benchmark':'#2e7d32'};
+const ACT={'Constraint failed':'A hard constraint is exceeded — check before anything else','Re-optimise':'Below 75 — re-optimisation likely to improve the plan',Review:'75–85 — review the components below the benchmark','Meets benchmark':'> 85 — reaches the achievable benchmark for this geometry'};
+const fmt=(x,c)=>x===null||x===undefined||isNaN(x)?'—':(c.two?x.toFixed(2):x.toFixed(x<10?2:1));
+let last=null;
+function render(){
+ const m=metric(); $('mname').innerHTML=m==='Paddick'?'Paddick CI':'CI<sub>RTOG</sub>';
+ $('CI').disabled=m==='Paddick'; $('PCI').disabled=m!=='Paddick';
+ $('brainLab').textContent='Brain − target '+BMET[$('scheme').value]+' (cm³)';
+ const c=read(); const w=[];
+ if(isNaN(c.vol)||c.vol<=0){return;}
+ if(c.vol<0.09||c.vol>40)w.push('Volume outside the atlas range (0.09–40 cm³): benchmarks are extrapolated.');
+ if(m==='Paddick'&&isNaN(c.PCI)){$('warns').innerHTML='<div class="warn">Enter the Paddick CI, or switch to CI<sub>RTOG</sub>.</div>';return;}
+ if(m==='Paddick'&&!isNaN(c.CI)&&c.PCI*c.CI>1.02)w.push('Paddick CI × CI_RTOG = '+(c.PCI*c.CI).toFixed(2)+' > 1: the two indices are inconsistent (they should share TV and PIV) — check the values.');
+ if(!isNaN(c.Q)&&!isNaN(c.D99)&&c.Q>(c.D99>1.5?c.D99/100:c.D99)+1e-9)w.push('Q_RTOG is above D99, which is not possible — check the values.');
+ const s=score(c); last={c,s};
+ $('sc').textContent=s.tot.toFixed(1); $('zone').textContent=s.zone; $('act').textContent=ACT[s.zone];
+ $('scoreBox').style.background=COL[s.zone]; $('mk').style.left='calc('+Math.max(0,Math.min(100,s.tot))+'% - 1px)';
+ $('dA').textContent=s.A.toFixed(1); $('dB').textContent=s.B.toFixed(1);
+ $('gates').innerHTML=s.g.length?'<div class="gate">Constraint exceeded: '+s.g.join('; ')+'</div>':'';
+ $('warns').innerHTML=w.map(x=>'<div class="warn">'+x+'</div>').join('');
+ $('tb').innerHTML=s.comp.map(x=>{const f=x.p/x.m;const col=f>=0.999?'#2e7d32':f>=0.6?'#7cb342':f>=0.25?'#d9a400':'#c62828';
+  return '<tr><td>'+x.k+'</td><td><b>'+fmt(x.x,x)+'</b></td><td>'+fmt(x.i,x)+'</td><td>'+fmt(x.t,x)+'</td><td>'+x.p.toFixed(1)+' / '+x.m+'</td><td><span class="bar"><i style="width:'+(100*f)+'%;background:'+col+'"></i></span></td></tr>'}).join('');
+ const lost=s.comp.map(x=>({k:x.k,l:x.m-x.p,x})).filter(z=>z.l>0.05).sort((a,b)=>b.l-a.l);
+ const tips=[]; if(s.g.length)tips.push('<b>Resolve the exceeded constraint first</b>; the score is only meaningful once every constraint is met.');
+ lost.slice(0,3).forEach(z=>tips.push('<b>'+z.k+'</b>: −'+z.l.toFixed(1)+' points. '+(z.x.i!==null?(z.x.hi?'Raise toward':'Reduce toward')+' the achievable value '+fmt(z.x.i,z.x)+'.':'')));
+ if(!tips.length)tips.push('Every component is at or better than the achievable benchmark for this geometry.');
+ $('tips').innerHTML=tips.map(t=>'<li>'+t+'</li>').join('');}
+const EX=[
+ {scheme:'SRS',rx:18,vol:6.1,shape:'irregular',loc:'central',CI:1.1,PCI:0.85,GI:2.98,Q:0.93,HI:1.1,D99:97,brain:7.6,oar:'',oard:''},
+ {scheme:'3FR',rx:27,vol:15.1,shape:'regular',loc:'central',CI:1.22,PCI:0.78,GI:3.25,Q:0.84,HI:1.15,D99:95,brain:10,oar:'brainstem',oard:13},
+ {scheme:'5FR',rx:30,vol:28,shape:'irregular',loc:'central',CI:1.2,PCI:0.78,GI:3.8,Q:0.77,HI:1.05,D99:94,brain:19,oar:'optic',oard:24},
+ {scheme:'SRS',rx:18,vol:5.8,shape:'irregular',loc:'central',CI:1.4,PCI:0.66,GI:5.5,Q:0.78,HI:1.1,D99:89,brain:8,oar:'brainstem',oard:14}];
+document.querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{const e=EX[+b.dataset.ex];for(const k in e)$(k).value=e[k];render();});
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',render);e.addEventListener('change',render);});
+$('copy').onclick=()=>{if(!last)return;const {c,s}=last;
+ const t=['vPQM v4 QA check ('+new Date().toISOString().slice(0,10)+') — not a clinical decision',
+  c.scheme+', '+c.vol+' cm³, '+c.shape+', '+c.loc+'; conformity index: '+(c.metric==='Paddick'?'Paddick CI':'CI_RTOG'),
+  'vPQM '+s.tot.toFixed(1)+' ('+s.zone+'); Domain A '+s.A.toFixed(1)+'/55, Domain B '+s.B.toFixed(1)+'/45',
+  ...s.comp.map(x=>x.k+': '+fmt(x.x,x)+' (ideal '+fmt(x.i,x)+', threshold '+fmt(x.t,x)+') '+x.p.toFixed(1)+'/'+x.m),
+  s.g.length?'Constraints exceeded: '+s.g.join('; '):'All hard constraints met'].join('\n');
+ navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>{$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy result as text',1500)});};
+render();
+}
+</script></body></html>
